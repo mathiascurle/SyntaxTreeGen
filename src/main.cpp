@@ -31,8 +31,8 @@ int main()
   #endif
 
   Camera2D camera;
-  // camera.target = Vector2 {fWinWidth/2.f, fWinHeight/2.f};
-  camera.target = Vector2 {50.f, (fWinHeight-60)/2.f}; // for ImGui on right
+  camera.target = Vector2 {fWinWidth/2.f, fWinHeight/2.f};
+  // camera.target = Vector2 {50.f, (fWinHeight-60)/2.f}; // for ImGui on right
   camera.offset = camera.target;
   camera.rotation = 0;
   camera.zoom = 0.7;
@@ -74,8 +74,7 @@ int main()
       fWinHeight = GetScreenHeight();
       sentenceRec = {0, fWinHeight-60.f, (float)fWinWidth, 60};
       float x = fWinWidth / fDefaultWinWidth;
-      float y = fWinHeight / fDefaultWinHeight;
-      // grid.fitGridToScreen();
+      // float y = fWinHeight / fDefaultWinHeight;
       camera.zoom = x - 0.3f;
     }
 
@@ -152,7 +151,7 @@ int main()
         wordNodes.resize(wordCount);
         string temp = "";
         int i = 0;
-        float tempY = GetScreenHeight()-200;
+        float tempY = (*GridSpace::getHeight()*0.8f);
         s_fGlobOffsetY = 0;
         float tempX = 20;
         WordNode tempNode;
@@ -224,6 +223,9 @@ int main()
     for (WordClassNode node : wordClassNodes)
       node.drawNode();
 
+    // DrawCircleV(camera.target, 20.f, RED);
+    // DrawCircleV(camera.offset, 20.f, BLUE);
+
     EndMode2D();
 
     // Sentece input
@@ -294,6 +296,8 @@ int main()
       ImGui::TextUnformatted(to_string(camera.zoom).c_str());
       float width = fWinWidth;
       ImGui::Text("Window width: %.3f", width);
+      camera.offset.x = (GetScreenWidth() - winWidthImGui) / 2;
+      camera.offset.y = (GetScreenHeight() - sentenceRec.height) / 2;
       if (ImGui::DragFloat("Window width", &fWinWidth, 1.f, 100, 2000) ||
           ImGui::DragFloat("Window height", &fWinHeight, 1.f, 100, 2000))
       {
@@ -304,12 +308,12 @@ int main()
           fWinHeight = GetScreenHeight();
           sentenceRec = {0, fWinHeight-60.f, (float)fWinWidth, 60};
           float x = fWinWidth / fDefaultWinWidth;
-          float y = fWinHeight / fDefaultWinHeight;
           camera.zoom = x - 0.3f;
         }
       }
+      if (ImGui::Button("Center camera"))
+        camera.target = Vector2 {fWinWidth/2.f, fWinHeight/2.f};
     }
-        // ImGui::GetWindowWidth();
     ImGui::End();
 
     if (showDemoWindow)

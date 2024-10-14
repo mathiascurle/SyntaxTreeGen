@@ -1,9 +1,16 @@
-**Syntax Tree Generator**
+# Syntax Tree Generator
 
-*How to build:*
-- mkdir out && cd out
-- cmake ..
-- make
-- *Run with ./SyntaxTreeGen*
+## Build
+````
+1  mkdir build && cd build
 
-If this not work something is wrong with pc idk
+2  cmake ..
+
+3  cmake --build . (eller bare "make")
+````
+## Run
+````
+./SyntaxTreeGen
+````
+
+*If this not work something is wrong with pc idk*

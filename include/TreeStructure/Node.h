@@ -25,7 +25,7 @@ protected:
   Vector2 m_vPos;
   Vector2 m_vSize;
 
-  bool m_bShowRect;
+  std::string m_sData = "";
 
   Node* m_parent;
 };

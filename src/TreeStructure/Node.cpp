@@ -44,8 +44,14 @@ Node* Node::getParent()
 
 void Node::drawNode()
 {
-  // DrawRectangleV(m_vPos, m_vSize, LIGHTGRAY);
-  // DrawRectangleLinesEx(Rectangle {m_vPos.x, m_vPos.y, m_vSize.x, m_vSize.y}, 2, BLACK);
+  if (s_bShowNodeBounds)
+  {
+    DrawRectangleV(m_vPos, m_vSize, RAYWHITE);
+    DrawRectangleLinesEx(Rectangle {m_vPos.x, m_vPos.y, m_vSize.x, m_vSize.y}, 2, BLACK);
+  }
+  DrawTextEx(GetFontDefault(), m_sData.c_str(), Vector2Add(m_vPos, s_vTextOffset), s_iFontSize, s_iSpacing, BLACK);
+  if (m_parent && s_bShowLines)
+    drawLineToParent();
 }
 
 void Node::drawLineToParent()

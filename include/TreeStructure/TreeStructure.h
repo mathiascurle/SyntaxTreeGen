@@ -4,4 +4,5 @@
 #include "WordNode.h"
 #include "ConnectorNode.h"
 #include "WordClassNode.h"
+#include "PhraseNode.h"
 // #include "EmptyNode.h"

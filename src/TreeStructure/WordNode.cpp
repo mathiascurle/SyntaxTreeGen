@@ -42,5 +42,5 @@ void WordNode::movePos(Vector2 delta)
 
 std::string* WordNode::getData()
 {
-  return & m_sData;
+  return &m_sData;
 }

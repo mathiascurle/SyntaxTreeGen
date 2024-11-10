@@ -10,7 +10,6 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <array>
 using namespace std;
 
 
@@ -19,7 +18,6 @@ int main()
   float fWinWidth = 1000;
   float fWinHeight = 600;
   float fDefaultWinWidth = fWinWidth;
-  float fDefaultWinHeight = fWinHeight;
   int   iTargetFPS = 60;
 
   SetConfigFlags(FLAG_WINDOW_RESIZABLE);
@@ -54,9 +52,7 @@ int main()
   phraseNodes[0].setSize({20, 20});
 
   float winWidthImGui = 300;
-  int iTypingPos = currentSentence.size();
   Rectangle sentenceRec = {0, fWinHeight-60.f, fWinWidth-winWidthImGui, 60};
-  bool bIsTyping = false;
   bool showDemoWindow = false;
   /*int selectedWord = 0;*/
   /*static float selectedWordPos[2] = {wordNodes[selectedWord].getPos()->x, wordNodes[selectedWord].getPos()->y};*/
@@ -64,6 +60,8 @@ int main()
   Font font = GetFontDefault();
   char phraseBuffer[255] = "";
 
+  bool  bIsTyping = false;
+  int   iTypingPos = currentSentence.size();
   float deleteTimer = 0; 
   float deleteSpeedTimer = 0; 
   float cursorTimer = 0;
@@ -207,6 +205,8 @@ int main()
     {
       if (IsKeyPressed(KEY_C))
         tree.connectSelectedNodes();
+      if (IsKeyPressed(KEY_A))
+        tree.addPhraseNode();
     }
 
     if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON) || 
@@ -232,30 +232,14 @@ int main()
     // Draw
     BeginDrawing();
     ClearBackground(Color {40, 40, 40, 250});
+
     BeginMode2D(camera);
-
-    GridSpace::draw();
-    GridSpace::drawResizeLine(GetScreenToWorld2D(vCurrentPos, camera));
-    
-    tree.drawTree();
-
-    // for (WordNode word : wordNodes)
-    //   word.drawNode();
-    //
-    // for (WordClassNode node : wordClassNodes)
-    //   node.drawNode();
-    //
-    // for (PhraseNode node : phraseNodes)
-    //   node.drawNode();
-
-
-    // DrawCircleV(camera.target, 20.f, RED);
-    // DrawCircleV(camera.offset, 20.f, BLUE);
-
+    {
+      GridSpace::draw();
+      GridSpace::drawResizeLine(GetScreenToWorld2D(vCurrentPos, camera));
+      tree.drawTree();
+    }
     EndMode2D();
-
-    // DrawCircleV(camera.target, 10.f, RED);
-    // DrawCircleV(camera.offset, 10.f, BLUE);
 
     // Sentece input
     DrawRectangleRec(sentenceRec, RAYWHITE);
@@ -322,9 +306,8 @@ int main()
       {
         if (ImGui::Button("Connect selected nodes"))
           tree.connectSelectedNodes();
-        if (ImGui::Button("Add phrase node"))
+        if (ImGui::Button("Add node"))
           tree.addPhraseNode();
-        ImGui::Button("Add empty node");
       }
       if (ImGui::CollapsingHeader("Global vars"))
       {

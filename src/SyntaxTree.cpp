@@ -175,11 +175,6 @@ Phrase::Phrase(string data) : NonLeaf(data)
   m_nodeType = NodeType::PHRASE;
 }
 
-void Phrase::addChild(Node* wordNode)
-{
-  m_children.push_back(wordNode);
-}
-
 
 Root::Root()
 {
@@ -189,12 +184,12 @@ Root::Root()
   m_vPos = {(GetScreenWidth()/2)-(m_vSize.x/2), 20};
 }
 
-void Root::addChild(Phrase* phraseNode)
-{
-  m_children.push_back(phraseNode);
-}
+/*void Root::addChild(Phrase* phraseNode)*/
+/*{*/
+/*  m_children.push_back(phraseNode);*/
+/*}*/
 
-Phrase* Root::getChild(int pos)
+Node* Root::getChild(int pos)
 {
   return m_children[pos];
 }
@@ -239,7 +234,7 @@ void Tree::initSentence(string data)
   string temp = "";
   m_wordNodes.clear();
   m_wordNodes.resize(wordCount);
-  float tempY = GetScreenHeight() * 0.8f;
+  float tempY = *GridSpace::getHeight() * 0.8f;
   float tempX = 20;
   for (char c : data)
   {
@@ -259,8 +254,6 @@ void Tree::initSentence(string data)
 
   tempX = m_wordNodes.front().getPos()->x;
   m_root.setOrigin({tempX + ((m_wordNodes.back().getPos()->x+m_wordNodes.back().getSize()->x-tempX)/2) - (m_root.getSize()->x/2) ,20});
-
-  // cout<<"Initialized sentence"<<endl;
 }
 
 void Tree::addPhraseNode()
@@ -284,23 +277,21 @@ void Tree::connectSelectedNodes()
 {
   if (!m_firstSelectedNode || !m_secondSelectedNode)
     return;
-
   int type1 = m_firstSelectedNode->getNodeType();
   int type2 = m_secondSelectedNode->getNodeType();
+  if ((type1 == NodeType::WORD && type2 == NodeType::WORD) ||
+      (m_firstSelectedNode == m_secondSelectedNode))
+    return;
 
-  if (type1 > type2) 
+  if (m_firstSelectedNode->getPos()->y < m_secondSelectedNode->getPos()->y)
   {
     m_firstSelectedNode->addChild(m_secondSelectedNode);
     m_secondSelectedNode->setParent(m_firstSelectedNode);
   }
-  else if (type1 <= type2 && type2 != NodeType::WORD)
+  else 
   {
     m_secondSelectedNode->addChild(m_firstSelectedNode);
     m_firstSelectedNode->setParent(m_secondSelectedNode);
-  }
-  else 
-  {
-    
   }
 }
 

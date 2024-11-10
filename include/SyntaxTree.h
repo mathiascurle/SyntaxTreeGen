@@ -1,4 +1,5 @@
 #pragma once
+#include "Grid.h"
 #include "raylib.h"
 #include "raymath.h"
 #include <vector>
@@ -104,10 +105,6 @@ class Phrase : public NonLeaf
 public:
   Phrase(Node* root = NULL);
   Phrase(string data);
-  void addChild(Node* wordNode);
-
-private:
-  vector<Node*> m_children;
 };
 
 
@@ -115,12 +112,12 @@ class Root : public Node
 {
 public:
   Root();
-  void addChild(Phrase* phraseNode);
-  Phrase* getChild(int pos);
+  /*void addChild(Phrase* phraseNode);*/
+  Node* getChild(int pos);
   bool hasChildren();
 
-private:
-  vector<Phrase*> m_children;
+/*private:*/
+/*  vector<Node*> m_children;*/
 };
 
 

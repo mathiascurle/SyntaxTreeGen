@@ -36,8 +36,8 @@ void Node::drawNode(bool isSelected)
                                     m_vPos.y, 
                                     m_vSize.x, 
                                     m_vSize.y}, 
-                         (isSelected && s_bShowHighlights) ? 4 : 2, 
-                         (isSelected && s_bShowHighlights) ? RED : BLACK);
+                         (isSelected && s_bShowHighlights) ? 5 : 2, 
+                         BLACK);
   }
   DrawTextEx(GetFontDefault(), 
              m_sData.c_str(), 
@@ -53,7 +53,7 @@ void Node::drawHighlight()
                                   m_vPos.y, 
                                   m_vSize.x, 
                                   m_vSize.y}, 
-                       2, 
+                       5, 
                        RED);
 }
 
@@ -65,6 +65,8 @@ void Node::autoSize()
                                   s_iSpacing);
   m_vSize.x = measure.x + (s_vTextPadding.x*2);
   m_vSize.y = measure.y + (s_vTextPadding.y*2);
+  m_bounds.width = m_vSize.x;
+  m_bounds.height = m_vSize.y;
 }
 
 void Node::setData(string data)
@@ -76,6 +78,8 @@ void Node::setData(string data)
 void Node::movePos(Vector2 delta)
 {
   m_vPos = Vector2Subtract(m_vPos, delta);
+  m_bounds.x = m_vPos.x;
+  m_bounds.y = m_vPos.y;
 }
 
 void Node::setOrigin(Vector2 pos)
@@ -87,6 +91,8 @@ void Node::setOrigin(Vector2 pos)
 void Node::setPos(Vector2 pos)
 {
   m_vPos = pos;
+  m_bounds.x = m_vPos.x;
+  m_bounds.y = m_vPos.y;
 }
 
 void Node::setSize(Vector2 size)
@@ -124,6 +130,12 @@ string Node::getData()
   return m_sData;
 }
 
+
+string* Node::getDataPtr()
+{
+  return &m_sData;
+}
+
 Node* Node::getParent()
 {
   return m_parent;
@@ -134,6 +146,11 @@ NodeType Node::getNodeType()
   return m_nodeType;
 }
 
+Rectangle* Node::getBounds()
+{
+  return &m_bounds;
+}
+
 bool Node::hasParent()
 {
   return m_parent;
@@ -141,7 +158,8 @@ bool Node::hasParent()
 
 void Node::addChild(Node* node)
 {
-  m_children.push_back(node);
+  if (node)
+    m_children.push_back(node);
 }
 
 
@@ -256,11 +274,28 @@ void Tree::initSentence(string data)
   m_root.setOrigin({tempX + ((m_wordNodes.back().getPos()->x+m_wordNodes.back().getSize()->x-tempX)/2) - (m_root.getSize()->x/2) ,20});
 }
 
-void Tree::addPhraseNode()
+void Tree::addPhraseNode(Vector2 pos)
 {
   m_phraseNodes.emplace_back("phrase");
-  m_phraseNodes.back().setParent(&m_root);
-  m_root.addChild(&m_phraseNodes.back());
+  m_phraseNodes.back().setPos(pos);
+  if (m_firstSelectedNode)
+  {
+    m_phraseNodes.back().setParent(m_firstSelectedNode);
+    m_firstSelectedNode->addChild(&m_phraseNodes.back());
+  }
+  else
+  {
+    m_phraseNodes.back().setParent(&m_root);
+    m_root.addChild(&m_phraseNodes.back());
+  }
+}
+
+void Tree::eraseSelectedNode()
+{
+  if (m_firstSelectedNode && m_iSelectedPhrase < m_phraseNodes.size())
+  {
+    m_phraseNodes.erase(m_phraseNodes.begin() + m_iSelectedPhrase);
+  }
 }
 
 void Tree::addToSelectedNodes(Node* node)
@@ -295,7 +330,7 @@ void Tree::connectSelectedNodes()
   }
 }
 
-bool Tree::startDraggingNode(Vector2 pos)
+Node* Tree::startDraggingNode(Vector2 pos)
 {
   Vector2 tempPos  = *m_root.getPos();
   Vector2 tempSize = *m_root.getSize();
@@ -309,7 +344,7 @@ bool Tree::startDraggingNode(Vector2 pos)
     m_draggingNode = &m_root;
     m_secondSelectedNode = m_firstSelectedNode;
     m_firstSelectedNode = m_draggingNode;
-    return true;
+    return m_draggingNode;
   }
 
   for (int i = 0; i<m_wordNodes.size(); i++)
@@ -327,7 +362,7 @@ bool Tree::startDraggingNode(Vector2 pos)
       m_iSelectedWord = i;
       m_secondSelectedNode = m_firstSelectedNode;
       m_firstSelectedNode = m_draggingNode;
-      return true;
+      return m_draggingNode;
     }
   }
 
@@ -346,10 +381,10 @@ bool Tree::startDraggingNode(Vector2 pos)
       m_iSelectedPhrase = i;
       m_secondSelectedNode = m_firstSelectedNode;
       m_firstSelectedNode = m_draggingNode;
-      return true;
+      return m_draggingNode;
     }
   }
-  return false;
+  return nullptr;
 }
 
 bool Tree::dragNode(Vector2 delta)
@@ -363,13 +398,13 @@ bool Tree::dragNode(Vector2 delta)
 void Tree::resetDragging()
 {
   if (m_draggingNode)
-    m_draggingNode = NULL;
+    m_draggingNode = nullptr;
 }
 
 void Tree::resetSelected()
 {
-  m_firstSelectedNode = NULL;
-  m_secondSelectedNode = NULL;
+  m_firstSelectedNode = nullptr;
+  m_secondSelectedNode = nullptr;
 }
 
 string Tree::getSelectedWordData()
@@ -396,7 +431,27 @@ int* Tree::getSelectedPhrase()
   return &m_iSelectedPhrase;
 }
 
+string* Tree::getSelectedNodeString()
+{
+  if (m_firstSelectedNode)
+    return m_firstSelectedNode->getDataPtr();
+  return nullptr;
+}
+
+Rectangle* Tree::getSelectedNodeBounds()
+{
+  if (m_firstSelectedNode)
+    return m_firstSelectedNode->getBounds();
+  return nullptr;
+}
+
 void Tree::setSelectedPhraseData(char* data)
 {
   m_phraseNodes[m_iSelectedPhrase].setData(data);
+}
+
+void Tree::autoSizeSelectedPhrase()
+{
+  if (m_firstSelectedNode)
+    m_firstSelectedNode->autoSize();
 }

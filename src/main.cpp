@@ -3,9 +3,11 @@
 #include "imgui.h"
 #include "rlImGui.h"
 
+#include "TreeStructure.h" // Gammel
+
 #include "Grid.h"
-#include "TreeStructure.h"
 #include "SyntaxTree.h"
+#include "Typing.h"
 
 #include <iostream>
 #include <string>
@@ -60,12 +62,8 @@ int main()
   Font font = GetFontDefault();
   char phraseBuffer[255] = "";
 
-  bool  bIsTyping = false;
-  int   iTypingPos = currentSentence.size();
-  float deleteTimer = 0; 
-  float deleteSpeedTimer = 0; 
-  float cursorTimer = 0;
-  float idleTypingTimer = 0;
+  /*int   iTypingPos = currentSentence.size();*/
+  bool bIsTypingNode = false;
 
   Vector2 vCurrentPos;
   Vector2 vDeltaPos;
@@ -103,15 +101,22 @@ int main()
     if (camera.zoom > 3.0f) camera.zoom = 3.0f;
     else if (camera.zoom < 0.3f) camera.zoom = 0.3f;
 
+    // Mouse inputs
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))  
     {
       // Start typing
       if (CheckCollisionPointRec(vCurrentPos, sentenceRec))
-        bIsTyping = true;
+      {
+        Typing::setWorkingString(&currentSentence, &sentenceRec);
+        bIsTypingNode = false;
+      }
       else
-        bIsTyping = false;
+      {
+        Typing::setWorkingString(nullptr);
+      }
 
-      if (!tree.startDraggingNode(GetScreenToWorld2D(vCurrentPos, camera)) && IsKeyDown(KEY_LEFT_CONTROL))
+      if (!tree.startDraggingNode(GetScreenToWorld2D(vCurrentPos, camera)) && 
+          !CheckCollisionPointRec(vCurrentPos, {fWinWidth-winWidthImGui, 0, fWinWidth, fWinHeight}))
         tree.resetSelected();
 
       // Start resizing
@@ -120,93 +125,6 @@ int main()
         GridSpace::resizing = GridSpace::Resizing::Bottom;
       else if (side == 2)
         GridSpace::resizing = GridSpace::Resizing::Right;
-    }
-
-    if (bIsTyping)
-    {
-      // Writing
-      int key = GetCharPressed();
-      if (IsKeyPressed(KEY_LEFT) && iTypingPos > 0)
-      {
-        deleteTimer = GetTime();
-        iTypingPos--;
-        idleTypingTimer = GetTime();
-      }
-      else if (IsKeyDown(KEY_LEFT) && iTypingPos >0)
-      {
-        if ((GetTime() - deleteTimer) > 0.4f)
-          if (GetTime() - deleteSpeedTimer > 0.08f)
-          {
-            iTypingPos--;
-            deleteSpeedTimer = GetTime();
-          }
-        idleTypingTimer = GetTime();
-      }
-      else if (IsKeyPressed(KEY_RIGHT) && iTypingPos < currentSentence.size())
-      {
-        deleteTimer = GetTime();
-        iTypingPos++;
-        idleTypingTimer = GetTime();
-      }
-      else if (IsKeyDown(KEY_RIGHT) && iTypingPos < currentSentence.size())
-      {
-        if ((GetTime() - deleteTimer) > 0.4f)
-          if (GetTime() - deleteSpeedTimer > 0.08f)
-          {
-            iTypingPos++;
-            deleteSpeedTimer = GetTime();
-          }
-        idleTypingTimer = GetTime();
-      }
-      else if (IsKeyPressed(KEY_BACKSPACE))
-      {
-        deleteTimer = GetTime();
-        if (currentSentence.size() > 0 && iTypingPos > 0)
-          currentSentence.erase(-1 + iTypingPos--, 1);
-      }
-      else if (IsKeyDown(KEY_BACKSPACE))
-      {
-        if ((GetTime() - deleteTimer) > 0.4f)
-          if (GetTime() - deleteSpeedTimer > 0.08f)
-            if (currentSentence.size() > 0 && iTypingPos > 0)
-            {
-              currentSentence.erase(-1 + iTypingPos--, 1);
-              deleteSpeedTimer = GetTime();
-            }
-        idleTypingTimer = GetTime();
-      }
-      else if (IsKeyDown(KEY_LEFT_SUPER) && IsKeyPressed(KEY_V))
-      {
-        string text = GetClipboardText();
-        currentSentence.insert(iTypingPos, text);
-        iTypingPos += text.size();
-        idleTypingTimer = GetTime();
-      }
-      else if (key != 0)
-      {
-        currentSentence.insert(currentSentence.begin()+iTypingPos++, char(key));
-        idleTypingTimer = GetTime();
-      }
-      if (IsKeyPressed(KEY_ENTER))
-      {
-        sentence = currentSentence;
-        // // Word classes
-        // for (int i = 0; i<wordNodes.size(); i++)
-        // {
-        //   wordClassNodes[i].setDataAuto(wordNodes[i].getData());
-        //   wordClassNodes[i].setIndex(i);
-        //   wordClassNodes[i].setPos(Vector2Add(*wordNodes[i].getPos(), {(wordNodes[i].getSize()->x/2)-(wordClassNodes[i].getSize()->x/2), -60.f}));
-        //   wordNodes[i].setParent(&wordClassNodes[i]);
-        // }
-        tree.initSentence(sentence);
-      }
-    }
-    else 
-    {
-      if (IsKeyPressed(KEY_C))
-        tree.connectSelectedNodes();
-      if (IsKeyPressed(KEY_A))
-        tree.addPhraseNode();
     }
 
     if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON) || 
@@ -227,6 +145,40 @@ int main()
         GridSpace::resizing = GridSpace::Resizing::NONE;
     }
 
+    // Keyboard inputs
+    if (Typing::isTyping())
+    {
+      Typing::moveCursor();
+      Typing::deleteAtCursor();
+      Typing::writeAtCursor();
+      /*Typing::submitChange();*/
+      if (IsKeyPressed(KEY_ENTER))
+      {
+        if (bIsTypingNode)
+        {
+          tree.autoSizeSelectedPhrase();
+        }
+        else
+        {
+          sentence = currentSentence;
+          tree.initSentence(sentence);
+        }
+      }
+    }
+    else 
+    {
+      if (IsKeyPressed(KEY_ENTER))
+      {
+        Typing::setWorkingString(tree.getSelectedNodeString(), tree.getSelectedNodeBounds());
+        bIsTypingNode = true;
+      }
+      if (IsKeyPressed(KEY_C))
+        tree.connectSelectedNodes();
+      if (IsKeyPressed(KEY_A))
+        tree.addPhraseNode(GetScreenToWorld2D(vCurrentPos, camera));
+      if (IsKeyPressed(KEY_X))
+        tree.eraseSelectedNode();
+    }
 
     
     // Draw
@@ -238,24 +190,22 @@ int main()
       GridSpace::draw();
       GridSpace::drawResizeLine(GetScreenToWorld2D(vCurrentPos, camera));
       tree.drawTree();
+      if (Typing::isTyping() && bIsTypingNode)
+      {
+        Typing::drawCursor();
+        Typing::drawSelectedBounds();
+      }
     }
     EndMode2D();
 
     // Sentece input
     DrawRectangleRec(sentenceRec, RAYWHITE);
-    DrawRectangleLinesEx(sentenceRec, 5, (bIsTyping) ? RED : DARKGRAY);
-    DrawTextEx(font, currentSentence.c_str(), Vector2{sentenceRec.x+10.f, sentenceRec.y+sentenceRec.height-45.f}, 30, 2, BLACK);
-    if (bIsTyping)
+    DrawRectangleLinesEx(sentenceRec, 5, DARKGRAY);
+    DrawTextEx(font, currentSentence.c_str(), Vector2{sentenceRec.x+10.f, sentenceRec.y+sentenceRec.height-45.f}, 32, 2, BLACK);
+    if (Typing::isTyping() && !bIsTypingNode)
     {
-      if (GetTime() - cursorTimer >= 1 || GetTime() - idleTypingTimer <= 1)
-        DrawLineEx({sentenceRec.x+MeasureTextEx(font, currentSentence.substr(0, iTypingPos).c_str(), 30, 2).x+12, sentenceRec.y+sentenceRec.height-45}, 
-                   {sentenceRec.x+MeasureTextEx(font, currentSentence.substr(0, iTypingPos).c_str(), 30, 2).x+12, sentenceRec.y+sentenceRec.height-15}, 
-                   2.f, BLACK);
-        // DrawLineEx({sentenceRec.x+MeasureTextEx(font, currentSentence.c_str(), 30, 2).x+12, sentenceRec.y+sentenceRec.height-45}, 
-        //            {sentenceRec.x+MeasureTextEx(font, currentSentence.c_str(), 30, 2).x+12, sentenceRec.y+sentenceRec.height-15}, 
-        //            2.f, BLACK);
-      if (GetTime() - cursorTimer >= 2)
-        cursorTimer = GetTime();
+      Typing::drawCursor();
+      Typing::drawSelectedBounds();
     }
 
     // imgui
@@ -349,8 +299,8 @@ int main()
         }
         if (ImGui::Button("Center camera"))
           camera.target = Vector2 {fWinWidth/2.f, fWinHeight/2.f};
-        ImGui::Text("%i", iTypingPos);
-        ImGui::Text("%c", currentSentence[iTypingPos-1]);
+        /*ImGui::Text("%i", iTypingPos);*/
+        /*ImGui::Text("%c", currentSentence[iTypingPos-1]);*/
         ImGui::Text("Camera target x %.2f", camera.target.x);
         ImGui::Text("Camera target y %.2f", camera.target.y);
         ImGui::Text("Camera offset x %.2f", camera.offset.x);

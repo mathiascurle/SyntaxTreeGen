@@ -57,8 +57,10 @@ public:
   Vector2  getTopV();
   Vector2  getBotV();
   string   getData();
+  string*  getDataPtr();
   Node*    getParent();
   NodeType getNodeType();
+  Rectangle* getBounds();
 
   bool hasParent();
   void addChild(Node* node);
@@ -67,6 +69,7 @@ protected:
   Vector2  m_vOrigin {0,0};
   Vector2  m_vPos;
   Vector2  m_vSize = {20,20};
+  Rectangle m_bounds;
   string   m_sData = "";
   Node*    m_parent;
   NodeType m_nodeType;
@@ -129,12 +132,13 @@ public:
   void drawTree();
   void updateTree();
   void initSentence(string data);
-  void addPhraseNode();
+  void addPhraseNode(Vector2 pos = {20, 20});
+  void eraseSelectedNode();
 
   void addToSelectedNodes(Node* node);
   void resetSelectedNodes();
   void connectSelectedNodes();
-  bool startDraggingNode(Vector2 pos);
+  Node* startDraggingNode(Vector2 pos);
   bool dragNode(Vector2 delta);
   void resetDragging();
   void resetSelected();
@@ -143,8 +147,12 @@ public:
   string getSelectedPhraseData();
   int*   getSelectedWord();
   int*   getSelectedPhrase();
+  
+  string* getSelectedNodeString();
+  Rectangle* getSelectedNodeBounds();
 
-  void   setSelectedPhraseData(char* data);
+  void setSelectedPhraseData(char* data);
+  void autoSizeSelectedPhrase();
 
 private:
   Root           m_root;
@@ -155,8 +163,8 @@ private:
   int   m_iSelectedWord = 0;
   int   m_iSelectedPhrase = 0;
 
-  Node* m_firstSelectedNode;
-  Node* m_secondSelectedNode;
+  Node* m_firstSelectedNode = nullptr;
+  Node* m_secondSelectedNode = nullptr;
   vector<Node*> m_selectedNodes;
 
   Node* m_draggingNode;

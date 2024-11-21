@@ -20,6 +20,8 @@ int main()
   float fWinWidth = 1000;
   float fWinHeight = 600;
   float fDefaultWinWidth = fWinWidth;
+  float winWidthImGui = 300;
+  float fViewWidth = fWinWidth-winWidthImGui;
   int   iTargetFPS = 60;
 
   SetConfigFlags(FLAG_WINDOW_RESIZABLE);
@@ -31,38 +33,24 @@ int main()
     ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
   #endif
 
-  GridSpace::initGrid(fWinWidth, fWinHeight, 20);
+  GridSpace::initGrid(fViewWidth, fWinHeight, 20);
 
   Camera2D camera;
-  camera.target = Vector2 {fWinWidth/2.f, fWinHeight/2.f};
-  // camera.target = Vector2 {50.f, (fWinHeight-60)/2.f}; // for ImGui on right
+  camera.target = Vector2 {fViewWidth/2.f, fWinHeight/2.f};
   camera.offset = camera.target;
-  // camera.target = Vector2 {0, 0};
-  // camera.offset = Vector2 {0, 0};
   camera.rotation = 0;
   camera.zoom = 0.7;
 
   string sentence;
   string currentSentence = "The quick brown fox";
 
-  // Containers
   SyntaxTree::Tree tree;
-  vector<WordNode> wordNodes(1);
-  vector<WordClassNode> wordClassNodes(1);
-  vector<PhraseNode> phraseNodes(1);
-  phraseNodes[0].setPos({100, 100});
-  phraseNodes[0].setSize({20, 20});
 
-  float winWidthImGui = 300;
-  Rectangle sentenceRec = {0, fWinHeight-60.f, fWinWidth-winWidthImGui, 60};
+  Rectangle sentenceRec = {0, fWinHeight-60.f, fViewWidth, 60};
   bool showDemoWindow = false;
-  /*int selectedWord = 0;*/
-  /*static float selectedWordPos[2] = {wordNodes[selectedWord].getPos()->x, wordNodes[selectedWord].getPos()->y};*/
 
   Font font = GetFontDefault();
   char phraseBuffer[255] = "";
-
-  /*int   iTypingPos = currentSentence.size();*/
   bool bIsTypingNode = false;
 
   Vector2 vCurrentPos;
@@ -70,23 +58,19 @@ int main()
   Vector2 vDeltaPosCamera;
   Vector2 vMousePrevPos;
 
+  RenderTexture viewTexture = LoadRenderTexture(fViewWidth, fWinHeight);
+  bool bViewIsOpen = true;
 
   while (!WindowShouldClose())
   {
-    // camera.target.x = (*GridSpace::getWidth()/2)-300;
-    // camera.target.y = (*GridSpace::getHeight()/2)-60;
-    // screen = 1000-300, 600-60
-    // grid = 1000, 600
-    // fit grid to screen
-    // camera.target = Vector2 {0, 0};
-    // camera.offset = Vector2Add(camera.target, {20, (fWinHeight-60-(*GridSpace::getHeight()*camera.zoom))/2});
-
     // Update
     if (IsWindowResized())
     {
       fWinWidth = GetScreenWidth();
       fWinHeight = GetScreenHeight();
-      sentenceRec = {0, fWinHeight-60.f, fWinWidth-winWidthImGui, 60};
+      fViewWidth = fWinWidth-winWidthImGui;
+      sentenceRec = {0, fWinHeight-60.f, fViewWidth, 60};
+      viewTexture = LoadRenderTexture(fViewWidth, fWinHeight);
       // float x = fWinWidth / fDefaultWinWidth;
       // float y = fWinHeight / fDefaultWinHeight;
       // camera.zoom = x - 0.4f;
@@ -180,11 +164,10 @@ int main()
         tree.eraseSelectedNode();
     }
 
-    
-    // Draw
-    BeginDrawing();
-    ClearBackground(Color {40, 40, 40, 250});
 
+    // Draw viewTexture
+    BeginTextureMode(viewTexture);
+    ClearBackground(Color {40, 40, 40, 250});
     BeginMode2D(camera);
     {
       GridSpace::draw();
@@ -207,6 +190,12 @@ int main()
       Typing::drawCursor();
       Typing::drawSelectedBounds();
     }
+    EndTextureMode();
+
+    
+    // Draw
+    BeginDrawing();
+    ClearBackground(BLACK);
 
     // imgui
 		rlImGuiBegin();
@@ -215,10 +204,19 @@ int main()
 		  ImGui::DockSpaceOverViewport(0,  NULL, ImGuiDockNodeFlags_PassthruCentralNode); // set ImGuiDockNodeFlags_PassthruCentralNode so that we can see the raylib contents behind the dockspace
     #endif
 
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+    ImGui::SetNextWindowPos(ImVec2(0, 0));
+    ImGui::SetNextWindowSize(ImVec2(fWinWidth-winWidthImGui, fWinHeight));
+    if (ImGui::Begin("Canvas", &bViewIsOpen, ImGuiWindowFlags_NoTitleBar))
+    {
+      rlImGuiImageRenderTextureFit(&viewTexture, true);
+    }
+    ImGui::End();
+    ImGui::PopStyleVar();
+
     ImGui::SetNextWindowPos(ImVec2(fWinWidth-winWidthImGui, 0));
     ImGui::SetNextWindowSize(ImVec2(winWidthImGui, fWinHeight));
-
-    if (ImGui::Begin("Side bar"))
+    if (ImGui::Begin("Side bar", &bViewIsOpen, ImGuiWindowFlags_NoTitleBar))
     {
       if (ImGui::CollapsingHeader("Show/Hide"))
       {
@@ -232,22 +230,15 @@ int main()
         ImGui::TextUnformatted(tree.getSelectedWordData().c_str());
         if (ImGui::InputInt("Word index", tree.getSelectedWord()))
         {
-          // selectedWordPos[0] = wordNodes[selectedWord].getPos()->x;
-          // selectedWordPos[1] = wordNodes[selectedWord].getPos()->y;
         }
-        // if (ImGui::DragFloat2("Word pos", selectedWordPos, 1.f, 0.0f, GetScreenWidth()))
-        //   wordNodes[selectedWord].setPos(Vector2 {selectedWordPos[0], selectedWordPos[1]});
       }
       if (ImGui::CollapsingHeader("Selected phrase"))
       {
-        /*ImGui::TextUnformatted(tree.getSelectedPhraseData().c_str());*/
         strcpy(phraseBuffer, tree.getSelectedPhraseData().c_str());
         if (ImGui::InputText("Phrase type", phraseBuffer, IM_ARRAYSIZE(phraseBuffer)))
         {
           tree.setSelectedPhraseData(phraseBuffer);
         }
-        /*if (ImGui::Button("Connect to selected word"))*/
-        /*  tree.connectWordToPhrase();*/
         if (ImGui::InputInt("Phrase index", tree.getSelectedPhrase()))
         {
         }
@@ -263,14 +254,6 @@ int main()
       {
         if (ImGui::InputInt("FontSize", &SyntaxTree::s_iFontSize))
         {
-          // float tempX = 20;
-          // float tempY = GetScreenHeight() -200;
-          // for (int i = 0; i<wordNodes.size(); i++)
-          // {
-          //   wordNodes[i].autoSize();
-          //   wordNodes[i].setPos(Vector2 {tempX, tempY});
-          //   tempX += wordNodes[i].getSize()->x + 20;
-          // }
         }
         ImGui::DragFloat("Global Y offest", &SyntaxTree::s_fGlobOffsetY, 1.f, -fWinHeight, fWinHeight);
       }
@@ -299,12 +282,8 @@ int main()
         }
         if (ImGui::Button("Center camera"))
           camera.target = Vector2 {fWinWidth/2.f, fWinHeight/2.f};
-        /*ImGui::Text("%i", iTypingPos);*/
-        /*ImGui::Text("%c", currentSentence[iTypingPos-1]);*/
         ImGui::Text("Camera target x %.2f", camera.target.x);
         ImGui::Text("Camera target y %.2f", camera.target.y);
-        ImGui::Text("Camera offset x %.2f", camera.offset.x);
-        ImGui::Text("Camera offset y %.2f", camera.offset.y);
       }
     }
     ImGui::End();

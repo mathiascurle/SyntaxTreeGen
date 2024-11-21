@@ -199,7 +199,8 @@ Root::Root()
   m_nodeType = NodeType::ROOT;
   m_sData = "Sentence";
   this->autoSize();
-  m_vPos = {(GetScreenWidth()/2)-(m_vSize.x/2), 20};
+  m_vPos = {20, 20};
+  /*m_vPos = {(GetScreenWidth()/2)-(m_vSize.x/2), 20};*/
 }
 
 /*void Root::addChild(Phrase* phraseNode)*/

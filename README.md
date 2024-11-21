@@ -8,9 +8,22 @@
 
 3  cmake --build . (eller bare "make")
 ````
+
 ## Run
 ````
 ./SyntaxTreeGen
 ````
 
-*If this not work something is wrong with pc idk*
+## Keybinds
+````
+A     - Add node at mouse pos
+C     - Connect the selected node with the previously selected node
+X     - Delete selected node
+ENTER - Start typing in selected node
+ESC   - Exit program (remove bind)
+````
+
+## Mouse
+````
+Ctrl+leftMouse or rightMouse to drag the camera
+````

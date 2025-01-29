@@ -1,7 +1,12 @@
 #pragma once
 #include "ConnectorNode.h"
 
-class PhraseNode : ConnectorNode
+enum PhraseTypes
+{
+  NP, VP, AdjP, AdvP, PP
+};
+
+class PhraseNode : public ConnectorNode
 {
 public:
   PhraseNode();

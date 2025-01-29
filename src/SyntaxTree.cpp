@@ -19,7 +19,7 @@ void Node::drawNode()
                          2, 
                          BLACK);
   }
-  DrawTextEx(GetFontDefault(), 
+  DrawTextEx(Typing::s_font, 
              m_sData.c_str(), 
              Vector2Add(m_vPos, s_vTextPadding),
              s_iFontSize, 
@@ -39,7 +39,7 @@ void Node::drawNode(bool isSelected)
                          (isSelected && s_bShowHighlights) ? 5 : 2, 
                          BLACK);
   }
-  DrawTextEx(GetFontDefault(), 
+  DrawTextEx(Typing::s_font, 
              m_sData.c_str(), 
              Vector2Add(m_vPos, s_vTextPadding),
              s_iFontSize, 
@@ -59,7 +59,7 @@ void Node::drawHighlight()
 
 void Node::autoSize()
 {
-  Vector2 measure = MeasureTextEx(GetFontDefault(),
+  Vector2 measure = MeasureTextEx(Typing::s_font,
                                   m_sData.c_str(),
                                   s_iFontSize,
                                   s_iSpacing);

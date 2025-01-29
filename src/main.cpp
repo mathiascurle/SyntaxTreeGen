@@ -24,6 +24,7 @@ int main()
   float fViewWidth = fWinWidth-winWidthImGui;
   int   iTargetFPS = 60;
 
+  SetConfigFlags(FLAG_MSAA_4X_HINT);
   SetConfigFlags(FLAG_WINDOW_RESIZABLE);
   InitWindow(fWinWidth, fWinHeight, "Syntacic trees");
   SetTargetFPS(iTargetFPS);
@@ -35,23 +36,29 @@ int main()
 
   GridSpace::initGrid(fViewWidth, fWinHeight, 20);
 
+  string sentence;
+  string currentSentence = "The quick brown fox";
+  /*Typing::s_font = LoadFontEx("Fonts/BitstreamVeraSansMono/BitstromWeraNerdFont-Regular.ttf", 128, 0, 250);*/
+  Typing::s_font = LoadFontEx("Fonts/Trebuchet MS Bold.ttf", 64, 0, 0);
+  // GenTextureMipmaps(&s_font.texture); // for trinlinear filtering
+  SetTextureFilter(Typing::s_font.texture, TEXTURE_FILTER_BILINEAR);
+
+
+  Rectangle sentenceRec = {0, fWinHeight-60.f, fViewWidth, 60};
+  bool showDemoWindow = false;
+
+  /*Font font = LoadFont("Fonts/BitstreamVeraSansMono/BitstromWeraNerdFont-Regular.ttf");*/
+  char phraseBuffer[255] = "";
+  bool bIsTypingNode = false;
+  /*SetTextLineSpacing(16);*/
+
+  SyntaxTree::Tree tree;
+
   Camera2D camera;
   camera.target = Vector2 {fViewWidth/2.f, fWinHeight/2.f};
   camera.offset = camera.target;
   camera.rotation = 0;
   camera.zoom = 0.7;
-
-  string sentence;
-  string currentSentence = "The quick brown fox";
-
-  SyntaxTree::Tree tree;
-
-  Rectangle sentenceRec = {0, fWinHeight-60.f, fViewWidth, 60};
-  bool showDemoWindow = false;
-
-  Font font = GetFontDefault();
-  char phraseBuffer[255] = "";
-  bool bIsTypingNode = false;
 
   Vector2 vCurrentPos;
   Vector2 vDeltaPos;
@@ -184,13 +191,16 @@ int main()
     // Sentece input
     DrawRectangleRec(sentenceRec, RAYWHITE);
     DrawRectangleLinesEx(sentenceRec, 5, DARKGRAY);
-    DrawTextEx(font, currentSentence.c_str(), Vector2{sentenceRec.x+10.f, sentenceRec.y+sentenceRec.height-45.f}, 32, 2, BLACK);
+    DrawTextEx(Typing::s_font, currentSentence.c_str(), Vector2{sentenceRec.x+10.f, sentenceRec.y+sentenceRec.height-45.f}, 32, 2, BLACK);
     if (Typing::isTyping() && !bIsTypingNode)
     {
       Typing::drawCursor();
       Typing::drawSelectedBounds();
     }
     EndTextureMode();
+
+    /*GenTextureMipmaps(&viewTexture.texture);*/
+    /*SetTextureFilter(&viewTexture.texture, TEXTURE_FILTER_BILINEAR);*/
 
     
     // Draw
@@ -204,15 +214,19 @@ int main()
 		  ImGui::DockSpaceOverViewport(0,  NULL, ImGuiDockNodeFlags_PassthruCentralNode); // set ImGuiDockNodeFlags_PassthruCentralNode so that we can see the raylib contents behind the dockspace
     #endif
 
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-    ImGui::SetNextWindowPos(ImVec2(0, 0));
-    ImGui::SetNextWindowSize(ImVec2(fWinWidth-winWidthImGui, fWinHeight));
-    if (ImGui::Begin("Canvas", &bViewIsOpen, ImGuiWindowFlags_NoTitleBar))
-    {
-      rlImGuiImageRenderTextureFit(&viewTexture, true);
-    }
-    ImGui::End();
-    ImGui::PopStyleVar();
+
+    BeginScissorMode(0, 0, fWinWidth-winWidthImGui, fWinHeight);
+      DrawTextureRec(viewTexture.texture, (Rectangle){ 0, 0, (float)viewTexture.texture.width, (float)-viewTexture.texture.height }, (Vector2){ 0, 0 }, WHITE);
+    EndScissorMode();
+    /*ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));*/
+    /*ImGui::SetNextWindowPos(ImVec2(0, 0));*/
+    /*ImGui::SetNextWindowSize(ImVec2(fWinWidth-winWidthImGui, fWinHeight));*/
+    /*if (ImGui::Begin("Canvas", &bViewIsOpen, ImGuiWindowFlags_NoTitleBar))*/
+    /*{*/
+    /*  rlImGuiImageRenderTextureFit(&viewTexture, true);*/
+    /*}*/
+    /*ImGui::End();*/
+    /*ImGui::PopStyleVar();*/
 
     ImGui::SetNextWindowPos(ImVec2(fWinWidth-winWidthImGui, 0));
     ImGui::SetNextWindowSize(ImVec2(winWidthImGui, fWinHeight));
@@ -285,6 +299,18 @@ int main()
         ImGui::Text("Camera target x %.2f", camera.target.x);
         ImGui::Text("Camera target y %.2f", camera.target.y);
       }
+      if (ImGui::Button("Save image"))
+      {
+        Image image = LoadImageFromTexture(viewTexture.texture);
+        ImageFlipVertical(&image);
+        int i = 0;
+        string filename = sentence+"_"+to_string(i)+".png";
+        while (FileExists(filename.c_str()))
+          filename = sentence+"_"+to_string(++i)+".png";
+        ExportImage(image, filename.c_str());
+        UnloadImage(image); 
+        /*TakeScreenshot("tree2.png");*/
+      }
     }
     ImGui::End();
 
@@ -296,6 +322,7 @@ int main()
     EndDrawing();
   }
 
+  UnloadFont(Typing::s_font);
 	rlImGuiShutdown();
   CloseWindow();
 

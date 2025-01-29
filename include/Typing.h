@@ -7,6 +7,8 @@ using namespace std;
 namespace Typing 
 {
 
+inline Font  s_font;
+
 inline bool  s_bIsTyping = false;
 inline float s_fHoldTimer = 0; 
 inline float s_fHoldSpeedTimer = 0; 

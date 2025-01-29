@@ -6,7 +6,7 @@ void Typing::drawCursor()
     return;
   if (GetTime() - Typing::s_fCursorTimer >= 1 || GetTime() - Typing::s_fIdleTypingTimer <= 1)
   {
-    Vector2 measure = MeasureTextEx(GetFontDefault(),
+    Vector2 measure = MeasureTextEx(Typing::s_font,
                                     s_string->substr(0, Typing::s_iTypingPos).c_str(),
                                     32,
                                     2);

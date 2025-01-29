@@ -76,6 +76,7 @@ endif()
 
 target_link_libraries("${CMAKE_PROJECT_NAME}" "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/raylib/lib/libraylib.a")
 # target_link_libraries(${PROJECT_NAME} raylib)
+target_link_options(${CMAKE_PROJECT_NAME} PRIVATE -mwindows)
 
 if (APPLE)
     target_link_libraries(${PROJECT_NAME} "-framework IOKit")

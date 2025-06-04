@@ -8,3 +8,4 @@ Makefile
 .DS_Store
 /.DS_Store
 SyntaxTreeGen
+.cache/

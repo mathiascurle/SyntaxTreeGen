@@ -27,3 +27,7 @@ ESC   - Exit program (remove bind)
 ````
 Ctrl+leftMouse or rightMouse to drag the camera
 ````
+
+---
+
+[!visuals/The quick brown fox_0.png]

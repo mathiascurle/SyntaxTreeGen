@@ -30,4 +30,4 @@ Ctrl+leftMouse or rightMouse to drag the camera
 
 ---
 
-![] (img/The quick brown fox_0.png)
+![](img/The_quick_brown_fox_0.png)

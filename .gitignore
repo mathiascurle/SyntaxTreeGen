@@ -6,3 +6,5 @@ build/
 CMakeSettings.json
 Makefile
 .DS_Store
+/.DS_Store
+SyntaxTreeGen

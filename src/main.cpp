@@ -311,6 +311,10 @@ int main()
         UnloadImage(image); 
         /*TakeScreenshot("tree2.png");*/
       }
+      if (ImGui::Button("POS tag sentence (english)"))
+      {
+        tree.posTagSentence(sentence);
+      }
     }
     ImGui::End();
 

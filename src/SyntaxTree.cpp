@@ -1,4 +1,5 @@
 #include "SyntaxTree.h"
+#include "POS_tagger.h"
 using namespace SyntaxTree;
 
 Node::Node(string data)
@@ -173,6 +174,21 @@ Word::Word(Node* root)
 {
   m_nodeType = NodeType::WORD;
   m_parent = root;
+}
+
+string Word::getData()
+{
+  return m_sData + ", " + m_PoS.getData();
+}
+
+string Word::getPoS()
+{
+  return m_PoS.getData();
+}
+
+void Word::setPoS(string data)
+{
+  m_PoS.setData(data);
 }
 
 
@@ -455,4 +471,14 @@ void Tree::autoSizeSelectedPhrase()
 {
   if (m_firstSelectedNode)
     m_firstSelectedNode->autoSize();
+}
+
+void Tree::posTagSentence(const string& sentence)
+{
+  json data = POS_tagger::getPOS(sentence);
+
+  int i = 0;
+  for (const auto& pair : data) {
+    m_wordNodes[i++].setPoS(pair[1]);
+  }
 }

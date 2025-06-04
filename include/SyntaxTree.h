@@ -90,6 +90,9 @@ class Word : public Node
 {
 public:
   Word(Node* root = NULL);
+  string getData();
+  string getPoS();
+  void setPoS(string data);
 
 public:
   PoS m_PoS;
@@ -154,6 +157,8 @@ public:
 
   void setSelectedPhraseData(char* data);
   void autoSizeSelectedPhrase();
+
+  void posTagSentence(const string& sentence);
 
 private:
   Root           m_root;

@@ -30,4 +30,8 @@ Ctrl+leftMouse or rightMouse to drag the camera
 
 ---
 
+### Export example:
 ![](img/The_quick_brown_fox_0.png)
+
+### Application example:
+![](img/example_1.png)

@@ -3,17 +3,12 @@
 #include "imgui.h"
 #include "rlImGui.h"
 
-#include "TreeStructure.h" // Gammel
-
+#include "Tree.hpp"
 #include "Grid.h"
 #include "SyntaxTree.h"
 #include "Typing.h"
 
-#include <iostream>
 #include <string>
-#include <vector>
-using namespace std;
-
 
 int main()
 {
@@ -52,7 +47,8 @@ int main()
   bool bIsTypingNode = false;
   /*SetTextLineSpacing(16);*/
 
-  SyntaxTree::Tree tree;
+  // SyntaxTree::Tree tree;
+  Tree tree;
 
   Camera2D camera;
   camera.target = Vector2 {fViewWidth/2.f, fWinHeight/2.f};

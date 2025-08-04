@@ -29,33 +29,24 @@ public:
   Tree();
   ~Tree();
   void drawTree() const;
-  void updateTree();
-  void initSentence(std::string data);
-  void addPhraseNode(Vector2 pos = {20, 20});
-  void eraseSelectedNode();
+  void dragNodes(const Vector2 mouseDeltaPos);
 
-  void addToSelectedNodes(Node *node);
-  void resetSelectedNodes();
-  void connectSelectedNodes();
-  Node *startDraggingNode(Vector2 pos);
-  bool dragNode(Vector2 delta);
-  void resetDragging();
-  void resetSelected();
+  bool selectNode(const Vector2 mousePos);
+  bool hasSelectedNodes();
 
-  std::string getSelectedWordData();
-  std::string getSelectedPhraseData();
-  int *getSelectedWord();
-  int *getSelectedPhrase();
+  bool isDraggingNodes();
+  void setDraggingNodes(const bool b);
+  bool isDoingBoxSelect();
+  void setDoingBoxSelect(const bool b);
 
-  std::string *getSelectedNodeString();
-  Rectangle *getSelectedNodeBounds();
-
-  void setSelectedPhraseData(char *data);
-  void autoSizeSelectedPhrase();
-
-  void posTagSentence(const std::string &sentence);
+  // void posTagSentence(const std::string &sentence);
 
 private:
   Node *m_root;
   std::vector<Node *> m_selectedNodes;
+
+  Rectangle m_selectionRec;
+
+  bool m_bDraggingNodes;
+  bool m_bDoingBoxSelect;
 };

@@ -1,15 +1,7 @@
-#!/bin/zsh
+#!/bin/bash
 
 mkdir build
 
 cd build
 
-cmake ..
-
-make
-
-cp SyntaxTreeGen ..
-
-cd ..
-
-./SyntaxTreeGen
+cmake .. && make && cp SyntaxTreeGen .. && cd .. && ./SyntaxTreeGen

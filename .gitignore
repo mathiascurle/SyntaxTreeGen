@@ -1,11 +1,7 @@
-/out
-bin/
 build/
-/.vs
-.idea/
-CMakeSettings.json
-Makefile
-.DS_Store
-/.DS_Store
-SyntaxTreeGen
 .cache/
+imgui.ini
+CMakeSettings.json
+.DS_Store
+*/.DS_Store
+SyntaxTreeGen

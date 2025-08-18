@@ -1,103 +1,89 @@
 #include "Grid.h"
+#include "raylib.h"
+#include "shared_data.hpp"
 
-void GridSpace::initGrid(int width, int height, int size)
-{
-  fWidth = width;
-  fHeight = height;
+void GridSpace::initGrid(Rectangle rect, int size) {
+  bounds.x = rect.x;
+  bounds.y = rect.y;
+  bounds.width = rect.width;
+  bounds.height = rect.height;
   iSize = size;
 
   resizing = NONE;
 
   bShowGrid = true;
-  bottomLine = {-10, fHeight, fWidth+20, 10};
-  rightLine = {fWidth, -10, 10, fHeight+20};
-  bottomLineHitbox = {bottomLine.x, bottomLine.y-10, bottomLine.width, bottomLine.height+20};
-  rightLineHitbox = {rightLine.x-10, rightLine.y, rightLine.width+20, rightLine.height};
+  bottomLine = {-10, bounds.height, bounds.width + 20, 10};
+  rightLine = {bounds.width, -10, 10, bounds.height + 20};
+  bottomLineHitbox = {bottomLine.x, bottomLine.y - 10, bottomLine.width,
+                      bottomLine.height + 20};
+  rightLineHitbox = {rightLine.x - 10, rightLine.y, rightLine.width + 20,
+                     rightLine.height};
+  rightLowCornerBox = {bounds.x+bounds.width-10, bounds.y+bounds.height-10, 30, 30};
 }
 
-void GridSpace::draw()
-{
-DrawRectangle(0, 0, fWidth, fHeight, RAYWHITE);
-  DrawRectangleLinesEx(Rectangle {-10, -10, fWidth+20.f, fHeight+20.f}, 10.f, BLACK);
-  if (bShowGrid)
-  {
-    int row = 0;
-    int col = 0;
-    while (row <= fHeight)
-    {
-      DrawLine(0, row, fWidth, row, GRAY); 
-      row += iSize;
-    }
-    while (col <= fWidth)
-    {
-      DrawLine(col, 0, col, fHeight, GRAY); 
-      col += iSize;
-    }
+void GridSpace::update() {
+  if (Globals.mouse.leftPressed) { // Started dragging
+    if (CheckCollisionPointRec(Globals.mouse.worldPos, rightLowCornerBox))
+      resizing = Both;
+    else if (CheckCollisionPointRec(Globals.mouse.worldPos, bottomLineHitbox))
+      resizing = Bottom;
+    else if (CheckCollisionPointRec(Globals.mouse.worldPos, rightLineHitbox))
+      resizing = Right;
+  } else if (!Globals.mouse.leftDown && resizing != NONE) { // Stop dragging
+    resizing = NONE;
+  }
+
+  if (resizing != NONE) { // Resize
+    resize();
   }
 }
 
-void GridSpace::drawResizeLine(Vector2 mousePos)
-{
-  if (isOverResize(mousePos) == 1 || resizing == Bottom)
-    DrawRectangleRec(bottomLine, RED);
+void GridSpace::draw() {
+  DrawRectangleRec(bounds, RAYWHITE);
+  DrawRectangleLinesEx(Rectangle{bounds.x - 10, bounds.y - 10,
+                                 bounds.width + 20.f, bounds.height + 20.f},
+                       10.f, BLACK);
+  if (bShowGrid) {
+    int row = 0;
+    int col = 0;
+    while (row <= bounds.height) {
+      DrawLine(bounds.x, bounds.y + row, bounds.x + bounds.width,
+               bounds.y + row, GRAY);
+      row += iSize;
+    }
+    while (col <= bounds.width) {
+      DrawLine(bounds.x + col, bounds.y, bounds.x + col,
+               bounds.y + bounds.height, GRAY);
+      col += iSize;
+    }
+  }
 
-  if (isOverResize(mousePos) == 2 || resizing == Right)
+  if (resizing == Both) {
+    DrawRectangleRec(rightLowCornerBox, RED);
+  } else if (resizing == Bottom)
+    DrawRectangleRec(bottomLine, RED);
+  else if (resizing == Right)
     DrawRectangleRec(rightLine, RED);
 }
 
-void GridSpace::resize(Vector2 delta)
-{
+void GridSpace::resize() {
   if (resizing == Bottom)
-    fHeight -= delta.y;
+    bounds.height += Globals.mouse.deltaPos.y;
   else if (resizing == Right)
-    fWidth -= delta.x;
-  updateGrid();
-}
+    bounds.width += Globals.mouse.deltaPos.x;
+  else if (resizing == Both) {
+    bounds.width += Globals.mouse.deltaPos.x;
+    bounds.height += Globals.mouse.deltaPos.y;
+  }
 
-void GridSpace::updateGrid()
-{
-  bottomLine.y = fHeight;
-  bottomLineHitbox.y = bottomLine.y-10;
-  rightLine.height = fHeight+20;
+  bottomLine.y = bounds.height;
+  bottomLineHitbox.y = bottomLine.y - 10;
+  rightLine.height = bounds.height + 20;
   rightLineHitbox.height = rightLine.height;
 
-  rightLine.x = fWidth;
-  rightLineHitbox.x = rightLine.x-10;
-  bottomLine.width = fWidth+20;
+  rightLine.x = bounds.width;
+  rightLineHitbox.x = rightLine.x - 10;
+  bottomLine.width = bounds.width + 20;
   bottomLineHitbox.width = bottomLine.width;
-}
-
-void GridSpace::fitGridToScreen()
-{
-  fWidth = GetScreenWidth();
-  fHeight = GetScreenHeight();
-
-  bottomLine = {-10, fHeight, fWidth+20, 10};
-  rightLine = {fWidth, -10, 10, fHeight+20};
-  bottomLineHitbox = {bottomLine.x, bottomLine.y-10, bottomLine.width, bottomLine.height+20};
-  rightLineHitbox = {rightLine.x-10, rightLine.y, rightLine.width+20, rightLine.height};
-}
-
-bool* GridSpace::getShowGrid()
-{
-  return &bShowGrid;
-}
-
-int GridSpace::isOverResize(Vector2 mousePos)
-{
-  if (CheckCollisionPointRec(mousePos, rightLineHitbox))
-    return Resizing::Right;
-  else if (CheckCollisionPointRec(mousePos, bottomLineHitbox))
-    return Resizing::Bottom;
-  else return Resizing::NONE;
-}
-
-float* GridSpace::getWidth()
-{
-  return &fWidth;
-}
-
-float* GridSpace::getHeight()
-{
-  return &fHeight;
+  rightLowCornerBox = {bounds.x+bounds.width-10, bounds.y+bounds.height-10, 30, 30};
 }

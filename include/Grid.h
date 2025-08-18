@@ -1,38 +1,34 @@
 #pragma once
 #include "raylib.h"
 
-namespace GridSpace 
-{
+// TODO: Fix world to screen stuff with resizing
+// TODO: Snapping to grid function
 
-void initGrid(int width, int height, int size);
+namespace GridSpace {
+
+void initGrid(Rectangle rect, int size);
 void draw();
+void update();
+
 void drawResizeLine(Vector2 mousePos);
-void resize(Vector2 delta);
-void updateGrid();
-void fitGridToScreen();
+void resize();
 
-int isOverResize(Vector2 mousePos);
-bool* getShowGrid();
-
-float* getWidth();
-float* getHeight();
-
-inline float fWidth;
-inline float fHeight;
+inline Rectangle bounds;
 inline float iSize;
-
 inline bool bShowGrid;
 
 inline Rectangle bottomLine;
 inline Rectangle rightLine;
 inline Rectangle bottomLineHitbox;
 inline Rectangle rightLineHitbox;
-  
-enum Resizing
-{
-  NONE = 0, Bottom = 1, Right = 2
+inline Rectangle rightLowCornerBox;
+
+enum Resizing {
+  NONE = 0,
+  Bottom = 1,
+  Right = 2,
+  Both = 3,
 };
 inline Resizing resizing;
 
-
-}
+} // namespace GridSpace

@@ -1,9 +1,32 @@
 #pragma once
 #include "raylib.h"
-#include <string>
+// #include <string>
 
 namespace Typing {
 
+void update();
+void drawInWorld();
+void drawStatic();
+
+void drawInputBox();
+void drawCursor();
+
+void writeAtCursor();
+
+Rectangle getCursorCoords();
+
+typedef struct CursorPos {
+  int wordIdx;
+  int charIdx;
+  int sentenceIdx;
+}CursorPos;
+
+inline Rectangle inputBox;
+inline CursorPos cursorPos = {0, 0, 0};
+
+inline bool bIsTyping = true;
+
+/*
 inline Font s_font;
 
 inline bool s_bIsTyping = false;
@@ -24,5 +47,6 @@ void deleteAtCursor();
 void writeAtCursor();
 
 bool isTyping();
+*/
 
 } // namespace Typing

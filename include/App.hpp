@@ -1,5 +1,4 @@
 #pragma once
-#include "Tree.hpp"
 
 class App {
 public:
@@ -10,8 +9,5 @@ private:
   void init();
   void shutdown();
   void update();
-  void draw();
-
-private:
-  Tree tree;
+  void draw() const;
 };

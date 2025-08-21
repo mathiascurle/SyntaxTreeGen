@@ -1,4 +1,6 @@
 #pragma once
+#include "Tree.hpp"
+#include "LinkedList.hpp"
 #include "raylib.h"
 #include "raymath.h"
 #include <string>
@@ -30,21 +32,32 @@ typedef struct Config {
   int iTargetFPS = DEFAULT_FPS;
 } Config;
 
+typedef struct FontData {
+  Font font;
+  float size = 30.f;
+  float bigSize = 45.f;
+  float spacing = 2.f;
+} FontData;
+
 typedef struct SharedData {
   Config config;
   Camera2D camera;
   Mouse mouse;
+  FontData fontData;
 
+  Tree tree;
   std::string loadedSentence;
   std::string currentSentence;
-  Font font;
+  Rectangle inputBox;
 } SharedData;
 
 inline SharedData Globals;
 
 inline void InitGlobals() {
-  Globals.currentSentence = "The quick brown fox";
-  Globals.font =
+  Globals.currentSentence = "";
+  Globals.inputBox = {0, Globals.config.fWinHeight - 60.f,
+                      Globals.config.fViewWidth, 60};
+  Globals.fontData.font =
       LoadFontEx("Fonts/Rethink_Sans/RethinkSans-Regular.ttf", 64, 0, 0);
 
   Globals.camera.target =

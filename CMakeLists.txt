@@ -25,6 +25,7 @@ set_property(TARGET "${CMAKE_PROJECT_NAME}" PROPERTY CXX_STANDARD 20)
 target_sources("${CMAKE_PROJECT_NAME}" PRIVATE
   "src/main.cpp"
   "src/Tree.cpp"
+  "src/Node.cpp"
   "src/Typing.cpp"
   "src/Grid.cpp"
   "src/App.cpp"

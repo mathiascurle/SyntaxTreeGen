@@ -1,12 +1,13 @@
 # Syntax Tree Generator
 
-## Build
+## Build and run macOS/Linux
+````bash
+./scripts/make.sh
 ````
-1  mkdir build && cd build
 
-2  cmake ..
-
-3  cmake --build . (eller bare "make")
+## Build and run Windows
+````bash
+./scripts/make.bat
 ````
 
 ## Run

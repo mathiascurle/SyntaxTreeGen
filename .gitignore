@@ -1,0 +1,8 @@
+build/
+.cache/
+imgui.ini
+CMakeSettings.json
+.DS_Store
+*/.DS_Store
+SyntaxTreeGen
+notes.md

@@ -1,21 +1,27 @@
 # Syntax Tree Generator
 
 ## Build and run macOS/Linux
-````bash
-$ ./scripts/make.sh
+
+````shell
+./scripts/make.sh
 ````
 
 ## Build and run Windows
-````bash
-$ ./scripts/make.bat
+
+````shell
+./scripts/make.bat
 ````
 
 ## Run
-````bash
-$ ./SyntaxTreeGen
+
+*In CMakeLists.txt change STATIC_LINK on line 66 to true for linking raylib statically*
+
+````shell
+./SyntaxTreeGen
 ````
 
 ## Keybinds
+
 ````
 A     - Add node at mouse pos
 C     - Connect the selected node with the previously selected node
@@ -25,6 +31,7 @@ ESC   - Exit program (remove bind)
 ````
 
 ## Mouse
+
 ````
 Ctrl+leftMouse or rightMouse to drag the camera
 ````
@@ -32,7 +39,9 @@ Ctrl+leftMouse or rightMouse to drag the camera
 ---
 
 ### Export example:
+
 ![](img/The_quick_brown_fox_0.png)
 
 ### Application example:
+
 ![](img/example_1.png)

@@ -2,17 +2,17 @@
 
 ## Build and run macOS/Linux
 ````bash
-./scripts/make.sh
+$ ./scripts/make.sh
 ````
 
 ## Build and run Windows
 ````bash
-./scripts/make.bat
+$ ./scripts/make.bat
 ````
 
 ## Run
-````
-./SyntaxTreeGen
+````bash
+$ ./SyntaxTreeGen
 ````
 
 ## Keybinds

@@ -38,8 +38,7 @@ int main()
 
   string sentence;
   string currentSentence = "The quick brown fox";
-  /*Typing::s_font = LoadFontEx("Fonts/BitstreamVeraSansMono/BitstromWeraNerdFont-Regular.ttf", 128, 0, 250);*/
-  Typing::s_font = LoadFontEx("Fonts/Trebuchet MS Bold.ttf", 64, 0, 0);
+  Typing::s_font = GetFontDefault();
   // GenTextureMipmaps(&s_font.texture); // for trinlinear filtering
   SetTextureFilter(Typing::s_font.texture, TEXTURE_FILTER_BILINEAR);
 
@@ -47,7 +46,6 @@ int main()
   Rectangle sentenceRec = {0, fWinHeight-60.f, fViewWidth, 60};
   bool showDemoWindow = false;
 
-  /*Font font = LoadFont("Fonts/BitstreamVeraSansMono/BitstromWeraNerdFont-Regular.ttf");*/
   char phraseBuffer[255] = "";
   bool bIsTypingNode = false;
   /*SetTextLineSpacing(16);*/
@@ -66,6 +64,8 @@ int main()
   Vector2 vMousePrevPos;
 
   RenderTexture viewTexture = LoadRenderTexture(fViewWidth, fWinHeight);
+  Rectangle rDrawRec;
+  Vector2 vDrawVec;
   bool bViewIsOpen = true;
 
   while (!WindowShouldClose())
@@ -202,6 +202,8 @@ int main()
     /*GenTextureMipmaps(&viewTexture.texture);*/
     /*SetTextureFilter(&viewTexture.texture, TEXTURE_FILTER_BILINEAR);*/
 
+    rDrawRec = { 0, 0, (float)viewTexture.texture.width, (float)-viewTexture.texture.height};
+    vDrawVec = { 0, 0 };
     
     // Draw
     BeginDrawing();
@@ -216,7 +218,7 @@ int main()
 
 
     BeginScissorMode(0, 0, fWinWidth-winWidthImGui, fWinHeight);
-      DrawTextureRec(viewTexture.texture, (Rectangle){ 0, 0, (float)viewTexture.texture.width, (float)-viewTexture.texture.height }, (Vector2){ 0, 0 }, WHITE);
+      DrawTextureRec(viewTexture.texture, rDrawRec, vDrawVec, WHITE);
     EndScissorMode();
     /*ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));*/
     /*ImGui::SetNextWindowPos(ImVec2(0, 0));*/

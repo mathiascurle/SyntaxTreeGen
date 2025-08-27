@@ -4,8 +4,8 @@
 #include "raylib.h"
 #include "rlImGui.h"
 
-#include "Grid.h"
-#include "Typing.h"
+#include "Grid.hpp"
+#include "Typing.hpp"
 #include "gui.hpp"
 #include "shared_data.hpp"
 

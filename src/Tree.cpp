@@ -1,4 +1,5 @@
 #include "Tree.hpp"
+#include "Grid.hpp"
 #include "shared_data.hpp"
 
 Tree::Tree() {}
@@ -7,10 +8,12 @@ Tree::~Tree() {
   // Iteratively delete all parents/grandparents of word nodes
   Node *current;
   for (int i = 0; i < sentence.size(); i++) {
+    // printf("At %i: \n", i);
     current = sentence.get(i);
     while (current != m_root && current != nullptr) {
       Node *temp = current;
       current = current->parent;
+      // printf("Deleting: %s\n", temp->data.c_str());
       delete temp;
     }
   }
@@ -18,8 +21,8 @@ Tree::~Tree() {
 }
 
 void Tree::init() {
-  m_root = new Node("root", ROOT);
-  sentence.push_back(new Node("", WORD, {10, 50}, m_root));
+  m_root = new Node("root", ROOT, {GridSpace::iSize, GridSpace::iSize});
+  // sentence.push_back(new Node("Hello", WORD, {10, 50}, m_root));
   // sentence.push_back(new Node("Hello", WORD, {10, 50}, m_root));
   // sentence.push_back(new Node("world", WORD, {100, 50}, m_root));
   // sentence.push_back(new Node("!", WORD, {200, 50}, m_root));
@@ -45,19 +48,26 @@ void Tree::update() {};
 
 void Tree::updateBounds() { m_root->updateBounds(); }
 
-void Tree::setNewSentence(const std::string_view &string) {
+void Tree::setNewSentence() {
   // Update loadedSentence
-  Globals.loadedSentence = string;
+  Globals.loadedSentence = Globals.currentSentence;
   // Empty the list of words
-  while (sentence.size()) {
-    sentence.pop();
+  while (sentence.size() != 0) {
+    // sentence.pop();
+    printf("Popped %s\n", sentence.pop()->data.c_str());
   }
   // Seperate words at ' ' and fill list
-  for (int pos, npos = 0; pos < string.size();) {
-    npos = string.find(' ', pos);
-    sentence.push_back(
-        new Node(Globals.loadedSentence.substr(pos, npos).c_str()));
-    pos = (pos < npos) ? pos : pos + 1;
+  Vector2 vPos = {GridSpace::iSize, GridSpace::bounds.y + GridSpace::bounds.height - 100};
+  for (int pos = 0, npos = 0; pos < Globals.loadedSentence.size();) {
+    npos = Globals.loadedSentence.find(' ', pos);
+    if (npos == Globals.loadedSentence.npos)
+      npos = Globals.loadedSentence.size(); // if end of sentence
+    std::string word = Globals.loadedSentence.substr(pos, npos-pos);
+    sentence.push_back(new Node(word.c_str(), WORD, vPos, m_root));
+    pos = (pos < npos) ? npos : pos + 1;
+    vPos.x += MeasureTextEx(Globals.fontData.font, word.c_str(),
+                            Globals.fontData.size, Globals.fontData.spacing)
+                  .x + 20;
   }
 }
 

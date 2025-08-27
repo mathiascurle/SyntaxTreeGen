@@ -1,4 +1,4 @@
-#include "Grid.h"
+#include "Grid.hpp"
 #include "raylib.h"
 #include "shared_data.hpp"
 
@@ -11,14 +11,14 @@ void GridSpace::initGrid(Rectangle rect, int size) {
 
   resizing = NONE;
 
-  bShowGrid = true;
   bottomLine = {-10, bounds.height, bounds.width + 20, 10};
   rightLine = {bounds.width, -10, 10, bounds.height + 20};
   bottomLineHitbox = {bottomLine.x, bottomLine.y - 10, bottomLine.width,
                       bottomLine.height + 20};
   rightLineHitbox = {rightLine.x - 10, rightLine.y, rightLine.width + 20,
                      rightLine.height};
-  rightLowCornerBox = {bounds.x+bounds.width-10, bounds.y+bounds.height-10, 30, 30};
+  rightLowCornerBox = {bounds.x + bounds.width - 10,
+                       bounds.y + bounds.height - 10, 30, 30};
 }
 
 void GridSpace::update() {
@@ -39,11 +39,16 @@ void GridSpace::update() {
 }
 
 void GridSpace::draw() {
+  // Bounds
   DrawRectangleRec(bounds, RAYWHITE);
   DrawRectangleLinesEx(Rectangle{bounds.x - 10, bounds.y - 10,
                                  bounds.width + 20.f, bounds.height + 20.f},
                        10.f, BLACK);
-  if (bShowGrid) {
+  // Grid
+  switch (gridType) {
+  case GridType::NONE:
+    break;
+  case GridType::REGULAR: {
     int row = 0;
     int col = 0;
     while (row <= bounds.height) {
@@ -56,8 +61,23 @@ void GridSpace::draw() {
                bounds.y + bounds.height, GRAY);
       col += iSize;
     }
+    break;
   }
-
+  case GridType::BULLET: {
+    int row = 0;
+    int col = 0;
+    while (row <= bounds.height) {
+      while (col <= bounds.width) {
+        DrawCircle(bounds.x + col, bounds.y + row, 1.2f, BLACK);
+        col += iSize;
+      }
+      col = 0;
+      row += iSize;
+    }
+    break;
+  }
+  }
+  // Resizing indicators
   if (resizing == Both) {
     DrawRectangleRec(rightLowCornerBox, RED);
   } else if (resizing == Bottom)
@@ -85,5 +105,6 @@ void GridSpace::resize() {
   rightLineHitbox.x = rightLine.x - 10;
   bottomLine.width = bounds.width + 20;
   bottomLineHitbox.width = bottomLine.width;
-  rightLowCornerBox = {bounds.x+bounds.width-10, bounds.y+bounds.height-10, 30, 30};
+  rightLowCornerBox = {bounds.x + bounds.width - 10,
+                       bounds.y + bounds.height - 10, 30, 30};
 }

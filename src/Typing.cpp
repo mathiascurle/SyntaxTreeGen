@@ -1,4 +1,4 @@
-#include "Typing.h"
+#include "Typing.hpp"
 #include "raylib.h"
 #include "shared_data.hpp"
 
@@ -16,7 +16,7 @@ void Typing::update() {
 
   if (bIsTyping) {
     if (IsKeyPressed(KEY_ENTER)) {
-      Globals.tree.setNewSentence(Globals.currentSentence);
+      Globals.tree.setNewSentence();
     }
     // Deletion
     else if (IsKeyPressed(KEY_BACKSPACE)) {

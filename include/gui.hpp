@@ -1,5 +1,6 @@
 #pragma once
-#include "Typing.h"
+#include "Grid.hpp"
+#include "Typing.hpp"
 #include "imgui.h"
 #include "rlImGui.h"
 #include "shared_data.hpp"
@@ -40,6 +41,18 @@ inline void draw() {
       ImGui::InputInt("wordIdx", &Typing::cursorPos.wordIdx);
       ImGui::InputInt("charIdx", &Typing::cursorPos.charIdx);
       ImGui::InputInt("sentenceIdx", &Typing::cursorPos.sentenceIdx);
+    }
+    if (ImGui::CollapsingHeader("Grid")) {
+      if (ImGui::BeginMenu("Grid type")) {
+        if (ImGui::MenuItem("None"))
+          GridSpace::gridType = GridSpace::GridType::NONE;
+        if (ImGui::MenuItem("Regular"))
+          GridSpace::gridType = GridSpace::GridType::REGULAR;
+        if (ImGui::MenuItem("Bullet"))
+          GridSpace::gridType = GridSpace::GridType::BULLET;
+        ImGui::EndMenu();
+      }
+      ImGui::DragFloat("Grid size", &GridSpace::iSize, 0.2f, 2.0f, 200.f);
     }
   }
   ImGui::End();

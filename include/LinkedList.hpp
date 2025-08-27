@@ -26,6 +26,7 @@ public:
   T get(int idx);
   T pop();
   T remove(int idx);
+  void clear();
 
   int size();
   void print();
@@ -155,7 +156,6 @@ template <typename T> T LinkedList<T>::pop() {
     m_first = temp;
   } else if (m_iSize == 1) {
     delete m_first;
-    delete m_last;
     m_first = NULL;
     m_last = NULL;
   }
@@ -169,7 +169,6 @@ template <typename T> T LinkedList<T>::remove(int idx) {
                             " out of bounds in remove()");
   } else {
     if (idx == 0) {
-      m_iSize--;
       return pop();
     } else {
       Node *temp = m_first;
@@ -184,6 +183,16 @@ template <typename T> T LinkedList<T>::remove(int idx) {
       m_iSize--;
       return returnValue;
     }
+  }
+}
+
+template <typename T> void LinkedList<T>::clear() {
+  Node *temp = m_first;
+  Node *nxt = temp;
+  while (temp != NULL) {
+    nxt = temp->next;
+    delete temp;
+    temp = nxt;
   }
 }
 

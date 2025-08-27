@@ -9,7 +9,7 @@ private:
 
   class Node {
   public:
-    Node(const char *_data = "null", NodeType _type = NONE, Vector2 _pos = {10, 10}, Node* _parent = nullptr);
+    Node(const char *_data = "null", NodeType _type = NONE, Vector2 _pos = {20, 20}, Node* _parent = nullptr);
     ~Node();
     void draw();
     void updateBounds();
@@ -40,7 +40,7 @@ public:
   void update();
 
   void updateBounds();
-  void setNewSentence(const std::string_view& string);
+  void setNewSentence();
   // void dragNodes(const Vector2 mouseDeltaPos);
 
   // bool selectNode(const Vector2 mousePos);

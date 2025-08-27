@@ -9,13 +9,10 @@ namespace GridSpace {
 void initGrid(Rectangle rect, int size);
 void draw();
 void update();
-
-void drawResizeLine(Vector2 mousePos);
 void resize();
 
 inline Rectangle bounds;
 inline float iSize;
-inline bool bShowGrid;
 
 inline Rectangle bottomLine;
 inline Rectangle rightLine;
@@ -30,5 +27,12 @@ enum Resizing {
   Both = 3,
 };
 inline Resizing resizing;
+
+enum class GridType {
+  NONE = 0,
+  REGULAR = 1,
+  BULLET = 2,
+};
+inline GridType gridType = GridType::REGULAR;
 
 } // namespace GridSpace

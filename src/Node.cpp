@@ -18,6 +18,8 @@ Tree::Node::~Node() {
     // Remove parents pointer to this
     for (int i = 0; i < parent->children.size(); i++) {
       if (parent->children.get(i) == this) {
+        printf("Iterating %s 's parent: %s 's child: %s \n", data.c_str(),
+               parent->data.c_str(), parent->children.get(i)->data.c_str());
         parent->children.remove(i);
       }
     }

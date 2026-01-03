@@ -54,6 +54,10 @@ inline void draw() {
       }
       ImGui::DragFloat("Grid size", &GridSpace::iSize, 0.2f, 2.0f, 200.f);
     }
+    if (ImGui::CollapsingHeader("Nodes")) {
+      if (ImGui::Button("Toggle help dots"))
+        Debug.showNodeDots = !Debug.showNodeDots;
+    }
   }
   ImGui::End();
   //////////////////////

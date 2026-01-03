@@ -52,6 +52,12 @@ typedef struct SharedData {
 
 inline SharedData Globals;
 
+typedef struct DebugData {
+  bool showNodeDots = false;
+} DebugData;
+
+inline DebugData Debug;
+
 inline void InitGlobals() {
   Globals.currentSentence = "";
   Globals.inputBox = {0, Globals.config.fWinHeight - 60.f,

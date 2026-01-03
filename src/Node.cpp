@@ -1,5 +1,6 @@
 #include "Tree.hpp"
 #include "raylib.h"
+#include "raymath.h"
 #include "shared_data.hpp"
 
 Tree::Node::Node(const char *_data, NodeType _type, Vector2 _pos,
@@ -38,12 +39,26 @@ void Tree::Node::draw() {
   DrawTextEx(Globals.fontData.font, data.c_str(),
              {bounds.x + textOffset.x, bounds.y + textOffset.y},
              Globals.fontData.size, Globals.fontData.spacing, BLACK);
-  DrawCircleV(topConnector, 4.f, BLUE);
-  DrawCircleV(bottomConnector, 4.f, RED);
+  if (Debug.showNodeDots) {
+    DrawCircleV(topConnector, 4.f, BLUE);
+    DrawCircleV(bottomConnector, 4.f, RED);
+  }
 
   // Draw line to children
   for (int i = 0; i < children.size(); i++) {
-    DrawLineV(bottomConnector, children.get(i)->topConnector, BLACK);
+    // DrawLineV(bottomConnector, children.get(i)->topConnector, BLACK);
+    Vector2 childTop = children.get(i)->topConnector;
+    float midPoint = (childTop.y - bottomConnector.y) / 2;
+    Vector2 points[] = {bottomConnector, Vector2Add(bottomConnector, {0, midPoint}),
+                        Vector2Subtract(childTop, {0, midPoint}),
+                        childTop};
+    if (Debug.showNodeDots) {
+      DrawCircleV(points[0], 5, RED);
+      DrawCircleV(points[1], 5, BLUE);
+      DrawCircleV(points[2], 5, GREEN);
+      DrawCircleV(points[3], 5, YELLOW);
+    }
+    DrawSplineBezierCubic(points, 4, 2, BLACK);
   }
 }
 

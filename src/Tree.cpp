@@ -1,5 +1,6 @@
 #include "Tree.hpp"
 #include "Grid.hpp"
+#include "raylib.h"
 #include "shared_data.hpp"
 
 Tree::Tree() {}
@@ -42,6 +43,12 @@ void Tree::draw() {
     // printf("Drew: %s\n", q.get(current)->data.c_str());
     current++;
   }
+  // Vector2 points[] = {{20, 20}, {20, 60}, {40, 60}, {40, 100}};
+  // DrawCircleV(points[0], 5, RED);
+  // DrawCircleV(points[1], 5, BLUE);
+  // DrawCircleV(points[2], 5, GREEN);
+  // DrawCircleV(points[3], 5, YELLOW);
+  // DrawSplineBezierCubic(points, 4, 2, BLACK);
 }
 
 void Tree::update() {};
